@@ -1,0 +1,21 @@
+{
+  "name": "your-life-your-stories-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "barry cronin",
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "ejs": "~2.6.1",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "mongodb": "^3.3.3",
+    "mongoose": "^5.7.7",
+    "morgan": "~1.9.1"
+  }
+}
