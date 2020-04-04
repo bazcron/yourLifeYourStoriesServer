@@ -64,6 +64,8 @@ console.log('inside router.addMember')
   member.videos = []
   console.log(member)
 
+  //......................
+
   member.save(function(err) {
     if (err)
       res.json({ message: 'Member NOT Added!', errmsg : err } );
