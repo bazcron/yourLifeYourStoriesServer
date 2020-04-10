@@ -1,6 +1,7 @@
 let mongoose = require('mongoose')
 let members = require('../models/members')
 let express = require('express')
+const bcrypt = require('bcryptjs')
 let router = express.Router()
 
 var mongodbUri = 'mongodb+srv://barry:hobbit00@cluster0-58mmj.mongodb.net/YourLifeYourStories?retryWrites=true&w=majority'
@@ -26,31 +27,6 @@ function getByValue(array, id) {
   return result ? result[0] : null; // or undefined
 }
 
-
-router.findOne = (req, res) => {
-
-  res.setHeader('Content-Type', 'application/json');
-
-  let member = getByValue(members,req.params.id);
-
-  if (member != null)
-    res.send(JSON.stringify(member,null,5));
-  else
-    res.send('That member is not here');
-}
-/*
-router.addMember = (req, res) => {
-  //Add a new member to our list
-  let id = Math.floor((Math.random() * 1000000) + 1); //Randomly generate an id
-  let currentSize = members.length;
-
-members.push({"id": id, "MemberName": req.body.MemberName, "password": req.body.password});
-  if((currentSize + 1) == members.length)
-    res.json({ message: 'Member Added Successfully!'});
-  else
-    res.json({ message: 'Member NOT Added!'});
-}
-*/
 router.addMember = (req, res) => {
 
   res.setHeader('Content-Type', 'application/json');
@@ -61,17 +37,26 @@ console.log('inside router.addMember')
   member.MemberName = req.body.memberName;
   member.Email =req.body.email;
   member.Password = req.body.password;
-  member.videos = []
-  console.log(member)
+  member.VideoStorageTime = 2000000;
+  member.videos = [];
+  console.log(member);
 
-  //......................
+  //...................... Encrypt the password -- then Add the new Member...................................
+    bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(member.Password, salt, (err, hash) =>{
+            if (err) throw err;
+            member.Password = hash;
+            console.log(member.Password);
+            member.save(function(err) {
+                if (err)
+                    res.json({ message: 'Member NOT Added!', errmsg : err } );
+                else
+                    res.json({ message: 'Member Successfully Added!', data: member });
+            });
 
-  member.save(function(err) {
-    if (err)
-      res.json({ message: 'Member NOT Added!', errmsg : err } );
-    else
-      res.json({ message: 'Member Successfully Added!', data: member });
-  });
+        })
+    })
+
 }
 router.deleteMember = (req, res) => {
   //Delete the selected member based on its id
@@ -88,17 +73,17 @@ router.deleteMember = (req, res) => {
 }
 
 
-/*router.findOne = (req, res) => {
+router.findOne = (req, res) => {
 
   res.setHeader('Content-Type', 'application/json');
 
-  members.find({ "id" : req.params.id },function(err, member) {
+  members.find({ "MemberName" : req.params.MemberName },function(err, member) {
     if (err)
       res.json({ message: 'member NOT Found!', errmsg : err } );
     else
       res.send(JSON.stringify(member,null,5));
   });
-}*/
+}
 
 module.exports = router;
 /*

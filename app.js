@@ -25,7 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Our Custom Your Life Your Stories Routes
 app.get('/members', members.findAll);
-app.get('/members/:id', members.findOne);
+app.get('/members/:MemberName', members.findOne);
 app.post('/members',members.addMember);
 app.delete('/members/:id', members.deleteMember);
 

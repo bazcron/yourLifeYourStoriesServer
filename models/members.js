@@ -11,6 +11,7 @@ let membersSchema = new mongoose.Schema({
         MemberName: String,
         Email: String,
         Password: String,
+        VideoStorageTime: Number,
         videos: [Number]
     },
     { collection: 'members' })

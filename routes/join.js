@@ -1,3 +1,4 @@
+/*
 let mongoose = require('mongoose')
 let members = require('../models/members')
 let express = require('express')
@@ -15,7 +16,8 @@ db.on('error', function (err) {
 db.once('open', function () {
     console.log('Successfully Connected to [ ' + db.name + ' ]')
 })
-
+*/
+/*
 router.addMember = (req, res) => {
 
     res.setHeader('Content-Type', 'application/json');
@@ -34,6 +36,6 @@ router.addMember = (req, res) => {
             res.json({ message: 'Member added!', data: member });
     });
 }
-
+*/
 module.exports = router;
 
