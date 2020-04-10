@@ -8,8 +8,14 @@
 let mongoose = require('mongoose')
 
 let membersSchema = new mongoose.Schema({
-        MemberName: String,
-        Email: String,
+        MemberName: {
+                unique: true,
+                type: String
+        },
+        Email: {
+                unique:true,
+                type: String
+        },
         Password: String,
         VideoStorageTime: Number,
         videos: [Number]

@@ -28,6 +28,7 @@ app.get('/members', members.findAll);
 app.get('/members/:MemberName', members.findOne);
 app.post('/members',members.addMember);
 app.delete('/members/:id', members.deleteMember);
+app.post('/members/:memberName', members.signIn);
 
 app.use('/', indexRouter);
 app.use('/members', memberRouter);

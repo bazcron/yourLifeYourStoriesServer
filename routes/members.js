@@ -48,10 +48,17 @@ console.log('inside router.addMember')
             member.Password = hash;
             console.log(member.Password);
             member.save(function(err) {
-                if (err)
-                    res.json({ message: 'Member NOT Added!', errmsg : err } );
-                else
-                    res.json({ message: 'Member Successfully Added!', data: member });
+                if (err){
+                    return res.status(400).json({
+                        error: 'Member Name or Email is already in use'
+                    })
+
+                }
+                else {
+                    return res.status(400).json({
+                        error: 'You Have Successfully Signed Up. /n Please Sign In to Start Your Stories'
+                    })
+                }
             });
 
         })
@@ -72,12 +79,41 @@ router.deleteMember = (req, res) => {
     res.json({ message: 'Member NOT Deleted!'});
 }
 
+router.signIn = (req, res) => {
+console.log('inside login in server' )
+    console.log("member name"+req.body.memberName)
+    console.log("password name"+req.body.password)
+
+    res.setHeader('Content-Type', 'application/json');
+
+    members.findOne({ MemberName : req.body.memberName},function(err, members) {
+        if (err) return res.status(500).json({
+            error: err
+    })
+        if(!members){
+            return res.status(401).json({
+                error: 'That Member or Password is Wrong'
+            })
+        }
+        //incorrect password entered
+        console.log('body password-'+req.body.password + ' member.password' + members.Password)
+        if(!bcrypt.compareSync(req.body.password, members.Password)){
+            return  res.status(401).json({
+                error: 'That Member or Password is Invalid'
+            })
+        }
+        //If Member & Password are Valid
+        return  res.status(200).json({
+            error: 'You are Logged In'
+        })
+    });
+}
 
 router.findOne = (req, res) => {
 
   res.setHeader('Content-Type', 'application/json');
 
-  members.find({ "MemberName" : req.params.MemberName },function(err, member) {
+  members.find({ "_id" : req.params.id },function(err, member) {
     if (err)
       res.json({ message: 'member NOT Found!', errmsg : err } );
     else
