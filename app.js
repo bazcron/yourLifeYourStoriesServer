@@ -10,6 +10,7 @@ let memberRouter = require('./routes/members');
 let app = express();
 
 const members = require("./routes/members");
+// const videoStories = require(("./routes/videoStories"))
 const cors = require("cors");
 
 // view engine setup
@@ -29,6 +30,7 @@ app.get('/members/:MemberName', members.findOne);
 app.post('/members',members.addMember);
 app.delete('/members/:id', members.deleteMember);
 app.post('/members/:memberName', members.signIn);
+app.post('/addNewVideoStory', members.addVideoStory)
 
 app.use('/', indexRouter);
 app.use('/members', memberRouter);

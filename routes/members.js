@@ -1,5 +1,6 @@
 let mongoose = require('mongoose')
 let members = require('../models/members')
+let videoStories = require('../models/videoStories')
 let express = require('express')
 const bcrypt = require('bcryptjs')
 let router = express.Router()
@@ -26,7 +27,35 @@ function getByValue(array, id) {
   let result  = array.filter(function(obj){return obj.id == id;} );
   return result ? result[0] : null; // or undefined
 }
+router.addVideoStory = (req, res) => {
 
+    res.setHeader('Content-Type', 'application/json');
+    console.log('inside router.addVideoStory')
+
+    let newVideoStory = new videoStories();
+
+    newVideoStory.storyTitle = req.body.storyTitle;
+    newVideoStory.storyCountry = req.body.storyCountry;
+    newVideoStory.storyLanguage = req.body.storyLanguage;
+    newVideoStory.storyDecade = req.body.storyDecade;
+    newVideoStory.storyDescription = req.body.storyDescription;
+    newVideoStory.storyMinutesUsed = req.body.storyMinutesUsed;
+    newVideoStory.storySecondsUsed = req.body.storySecondsUsed;
+    console.log(newVideoStory);
+    newVideoStory.save(function(err) {
+        if (err){
+            return res.status(400).json({
+                error: 'Unable to Save Video Story'
+            })
+
+        }
+        else {
+            return res.status(200).json({
+                error: 'Video Story Saved'
+            })
+        }
+    });
+}
 router.addMember = (req, res) => {
 
   res.setHeader('Content-Type', 'application/json');
@@ -37,6 +66,7 @@ console.log('inside router.addMember')
   member.MemberName = req.body.memberName;
   member.Email =req.body.email;
   member.Password = req.body.password;
+  member.Bio = '';
   member.VideoStorageTime = 2000000;
   member.videos = [];
   console.log(member);
@@ -55,8 +85,8 @@ console.log('inside router.addMember')
 
                 }
                 else {
-                    return res.status(400).json({
-                        error: 'You Have Successfully Signed Up. /n Please Sign In to Start Your Stories'
+                    return res.status(200).json({
+                        error: 'You Have Successfully Signed Up. Please Sign In to Start Your Stories'
                     })
                 }
             });
@@ -67,7 +97,7 @@ console.log('inside router.addMember')
 }
 router.deleteMember = (req, res) => {
   //Delete the selected member based on its id
-  let member = getByValue(members,req.params.id);
+  let member = getByValue(members,req.params.MemberName);
   let index = members.indexOf(member);
 
   let currentSize = members.length;

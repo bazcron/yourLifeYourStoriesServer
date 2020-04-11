@@ -17,6 +17,7 @@ let membersSchema = new mongoose.Schema({
                 type: String
         },
         Password: String,
+        Bio: String,
         VideoStorageTime: Number,
         videos: [Number]
     },
