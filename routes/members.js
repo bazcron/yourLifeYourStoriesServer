@@ -3,6 +3,7 @@ let members = require('../models/members')
 let videoStories = require('../models/videoStories')
 let express = require('express')
 const bcrypt = require('bcryptjs')
+const webToken = require(('jsonwebtoken'))
 let router = express.Router()
 
 var mongodbUri = 'mongodb+srv://barry:hobbit00@cluster0-58mmj.mongodb.net/YourLifeYourStories?retryWrites=true&w=majority'
@@ -132,9 +133,11 @@ console.log('inside login in server' )
                 error: 'That Member or Password is Invalid'
             })
         }
-        //If Member & Password are Valid
+        //If Member & Password are Valid   create a web token and sent to the front end
+        let token = webToken.sign({memberId: members._id}, 'secretkey')
         return  res.status(200).json({
-            error: 'You are Logged In'
+            error: 'You are Logged In',
+            token: token
         })
     });
 }
