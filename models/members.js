@@ -19,7 +19,7 @@ let membersSchema = new mongoose.Schema({
         Password: String,
         Bio: String,
         VideoStorageTime: Number,
-        videos: [Number]
+        storyId: [String]
     },
     { collection: 'members' })
 

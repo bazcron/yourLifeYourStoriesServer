@@ -8,6 +8,7 @@
 let mongoose = require('mongoose')
 
 let videoStoriesSchema = new mongoose.Schema({
+        storyId: String,
         storyTitle: String,
         storyCountry: String,
         storyLanguage: String,

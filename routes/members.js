@@ -134,12 +134,36 @@ console.log('inside login in server' )
             })
         }
         //If Member & Password are Valid   create a web token and sent to the front end
-        let token = webToken.sign({memberId: members._id}, 'secretkey')
+        let token = webToken.sign({memberId: members._id, MemberName: members.MemberName, MemberVideoStories: members.storyId}, 'secretkey')
         return  res.status(200).json({
             error: 'You are Logged In',
             token: token
         })
+        console.log('token '+ token)
     });
+}
+router.returnTokenData = (req, res, next) => {
+    console.log('inside return token data' )
+    let token = req.headers.token;
+    webToken.verify(token, 'secretkey', (err, decoded) =>{
+        console.log('error? ' + err)
+        if (err) return res.status(401).json({
+        })
+        console.log('decoded ' + decoded.memberId);
+        // if token is valid...........................
+        members.findOne({_id: decoded.memberId}, (err, members) => {
+            if (err) return console.log(err)
+            console.log(members);
+            // no error..return token data
+            return res.status(200).json({
+                members: {
+                    MemberId: members._id,
+                    MemberName: members.MemberName,
+                    storyId: members.storyId
+                }
+            })
+        })
+    })
 }
 
 router.findOne = (req, res) => {
@@ -153,6 +177,8 @@ router.findOne = (req, res) => {
       res.send(JSON.stringify(member,null,5));
   });
 }
+
+
 
 module.exports = router;
 /*

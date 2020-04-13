@@ -31,6 +31,7 @@ app.post('/members',members.addMember);
 app.delete('/members/:id', members.deleteMember);
 app.post('/members/:memberName', members.signIn);
 app.post('/addNewVideoStory', members.addVideoStory)
+app.get('/returnTokenData', members.returnTokenData)
 
 app.use('/', indexRouter);
 app.use('/members', memberRouter);
