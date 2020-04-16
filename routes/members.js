@@ -10,7 +10,8 @@ var mongodbUri = 'mongodb+srv://barry:hobbit00@cluster0-58mmj.mongodb.net/YourLi
 
 mongoose.connect(mongodbUri)
 let db = mongoose.connection
-
+let token = webToken
+let decodedMemberId = ''
 db.on('error', function (err) {
   console.log('Unable to Connect to [ ' + db.name + ' ]', err)
 })
@@ -23,19 +24,51 @@ router.findAll = (req, res) => {
   // Return a JSON representation of our list
   res.json(members);
 }
+router.findOne = (req, res) => {
+
+    res.setHeader('Content-Type', 'application/json');
+
+    members.find({ "_id" : req.params.id },function(err, member) {
+        if (err)
+            res.json({ message: 'Statement NOT Found!', errmsg : err } );
+        else
+            res.send(JSON.stringify(member,null,5));
+    });
+}
+router.findSomeStories = (req, res) => {
+    console.log('inside findSomeStories + res '+res);
+    res.setHeader('Content-Type', 'application/json');
+    console.log('inside findSomeStories + req2 '+req.params);
+    videoStories.find({storyId: {$in: res.params}}, function(err, videos){
+        if (err) {
+            console.log('err' + err);
+            res.json({message: 'Statement NOT Found!'});
+        }
+        else {
+            console.log('videos ' + videos);
+            res.send(JSON.stringify(videos, null, 5));
+        }
+    });
+}
 
 function getByValue(array, id) {
   let result  = array.filter(function(obj){return obj.id == id;} );
   return result ? result[0] : null; // or undefined
 }
+
 router.addVideoStory = (req, res) => {
 
     res.setHeader('Content-Type', 'application/json');
     console.log('inside router.addVideoStory')
+    // creating a unique random id for each video story....................................
+    //
+    let storyTitle = req.body.storyTitle;
+    let storyId = storyTitle.slice(0,3);
+    storyId = storyId + (Math.floor(Math.random() * Math.floor(9999999)));
 
     let newVideoStory = new videoStories();
-
-    newVideoStory.storyTitle = req.body.storyTitle;
+    newVideoStory.storyId = storyId;
+    newVideoStory.storyTitle = storyTitle;
     newVideoStory.storyCountry = req.body.storyCountry;
     newVideoStory.storyLanguage = req.body.storyLanguage;
     newVideoStory.storyDecade = req.body.storyDecade;
@@ -51,12 +84,31 @@ router.addVideoStory = (req, res) => {
 
         }
         else {
+            console.log('token='+ token)
+            let memberIdDecoded = decodedMemberId.memberId
+            console.log('decoded of Id' + decodedMemberId)
+            console.log('inside add videoStory, new video story added to array of storyId ' + members)
+            members.findById(decodedMemberId, function(err,member) {
+                if (err)
+                    res.json({ message: 'Error that ID is not valid. Please try again!' } );
+                else {
+                    member.storyId.push(newVideoStory.storyId);
+                    member.save(function (err) {
+                        if (err)
+                            res.json({ message: 'Could not add video Id to member!', errmsg : member } );
+                        else
+                            res.json({ message: 'Video Id added to member!', data: member });
+                    });
+                }
+            });
             return res.status(200).json({
                 error: 'Video Story Saved'
             })
         }
-    });
+
+        });
 }
+
 router.addMember = (req, res) => {
 
   res.setHeader('Content-Type', 'application/json');
@@ -134,7 +186,8 @@ console.log('inside login in server' )
             })
         }
         //If Member & Password are Valid   create a web token and sent to the front end
-        let token = webToken.sign({memberId: members._id, MemberName: members.MemberName, MemberVideoStories: members.storyId}, 'secretkey')
+        console.log('before creating the token check the array ' + members.storyId)
+        token = webToken.sign({memberId: members._id, MemberName: members.MemberName, MemberVideoStories: members.storyId}, 'secretkey')
         return  res.status(200).json({
             error: 'You are Logged In',
             token: token
@@ -144,11 +197,12 @@ console.log('inside login in server' )
 }
 router.returnTokenData = (req, res, next) => {
     console.log('inside return token data' )
-    let token = req.headers.token;
+    token = req.headers.token;
     webToken.verify(token, 'secretkey', (err, decoded) =>{
         console.log('error? ' + err)
         if (err) return res.status(401).json({
         })
+        decodedMemberId = decoded.memberId;
         console.log('decoded ' + decoded.memberId);
         // if token is valid...........................
         members.findOne({_id: decoded.memberId}, (err, members) => {
