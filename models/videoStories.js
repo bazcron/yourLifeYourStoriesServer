@@ -12,6 +12,7 @@ let videoStoriesSchema = new mongoose.Schema({
             unique:true,
             type: String
         },
+        storyFirebaseRef: String,
         storyTitle: String,
         storyCountry: String,
         storyLanguage: String,

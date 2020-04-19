@@ -30,23 +30,36 @@ router.findOne = (req, res) => {
 
     members.find({ "_id" : req.params.id },function(err, member) {
         if (err)
-            res.json({ message: 'Statement NOT Found!', errmsg : err } );
+            return res.json({ message: 'Member NOT Found!', errmsg : err } );
         else
-            res.send(JSON.stringify(member,null,5));
+            return res.send(JSON.stringify(member,null,5));
     });
 }
-router.findSomeStories = (req, res) => {
-    console.log('inside findSomeStories + res '+res);
+router.getVideoStories = (req, res) => {
+
     res.setHeader('Content-Type', 'application/json');
-    console.log('inside findSomeStories + req2 '+req.params);
-    videoStories.find({storyId: {$in: res.params}}, function(err, videos){
+
+    let arrayIThink = req.path.valueOf().split(',')
+    // let arrayIThink = req.path
+
+    /*let stringJoin = arrayIThink.join(',')
+    let arrayAgain = stringJoin.split(',')
+    console.log('arrayIThink' )
+    console.log(arrayIThink)
+    console.log('stringJoin ')
+    console.log(stringJoin)
+    console.log('arrayAgain')
+    console.log( arrayAgain)*/
+
+    videoStories.find({'storyId': {$in: arrayIThink}}, function(err, videos){
         if (err) {
             console.log('err' + err);
-            res.json({message: 'Statement NOT Found!'});
+            return res.json({message: 'Story NOT Found!'});
         }
         else {
-            console.log('videos ' + videos);
-            res.send(JSON.stringify(videos, null, 5));
+            console.log('arrayIThink' + arrayIThink);
+            // console.log('req ' + req)
+            return res.send(JSON.stringify(videos, null, 5));
         }
     });
 }
@@ -56,19 +69,23 @@ function getByValue(array, id) {
   return result ? result[0] : null; // or undefined
 }
 
-router.addVideoStory = (req, res) => {
+router.addNewVideoStory = (req, res) => {
 
     res.setHeader('Content-Type', 'application/json');
     console.log('inside router.addVideoStory')
     // creating a unique random id for each video story....................................
     //
-    let storyTitle = req.body.storyTitle;
-    let storyId = storyTitle.slice(0,3);
+    //let storyTitle = req.body.storyTitle;
+    /*storyId = storyTitle.slice(0,3);
+    storyId = storyId.replace(/\s+/g, '');  // remove all spaces so the server can handle it better
+    console.log(storyId + "...")
     storyId = storyId + (Math.floor(Math.random() * Math.floor(9999999)));
-
+    console.log(storyId)*/
+    console.log('checking storyFirebaseRef ' + req.body.storyFirebaseRef)
     let newVideoStory = new videoStories();
-    newVideoStory.storyId = storyId;
-    newVideoStory.storyTitle = storyTitle;
+    newVideoStory.storyFirebaseRef = req.body.storyFirebaseRef;
+    newVideoStory.storyTitle = req.body.storyTitle;
+    newVideoStory.storyId = req.body.storyId;
     newVideoStory.storyCountry = req.body.storyCountry;
     newVideoStory.storyLanguage = req.body.storyLanguage;
     newVideoStory.storyDecade = req.body.storyDecade;
@@ -90,14 +107,18 @@ router.addVideoStory = (req, res) => {
             console.log('inside add videoStory, new video story added to array of storyId ' + members)
             members.findById(decodedMemberId, function(err,member) {
                 if (err)
-                    res.json({ message: 'Error that ID is not valid. Please try again!' } );
+                    return res.json({ message: 'Error that ID is not valid. Please try again!' } );
                 else {
                     member.storyId.push(newVideoStory.storyId);
                     member.save(function (err) {
                         if (err)
-                            res.json({ message: 'Could not add video Id to member!', errmsg : member } );
-                        else
-                            res.json({ message: 'Video Id added to member!', data: member });
+                            return res.status(400).json({
+                                error: 'Could not add video Id to member!'
+                            })
+                                // return res.json({ message: 'Could not add video Id to member!', errmsg : member } );
+                       //  else
+                            // return res.json({ message: 'Video Id added to member!', data: member });
+                       //  return res.json({ error: 'Video Id added to member!' });
                     });
                 }
             });
@@ -157,9 +178,9 @@ router.deleteMember = (req, res) => {
   members.splice(index, 1);
 
   if((currentSize - 1) == members.length)
-    res.json({ message: 'Member Deleted!'});
+    return res.json({ message: 'Member Deleted!'});
   else
-    res.json({ message: 'Member NOT Deleted!'});
+    return res.json({ message: 'Member NOT Deleted!'});
 }
 
 router.signIn = (req, res) => {
@@ -226,9 +247,9 @@ router.findOne = (req, res) => {
 
   members.find({ "_id" : req.params.id },function(err, member) {
     if (err)
-      res.json({ message: 'member NOT Found!', errmsg : err } );
+      return res.json({ message: 'member NOT Found!', errmsg : err } );
     else
-      res.send(JSON.stringify(member,null,5));
+      return res.send(JSON.stringify(member,null,5));
   });
 }
 

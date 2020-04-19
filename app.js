@@ -29,9 +29,9 @@ app.get('/members/:MemberName', members.findOne);
 app.post('/members',members.addMember);
 app.delete('/members/:id', members.deleteMember);
 app.post('/members/:memberName', members.signIn);
-app.post('/addNewVideoStory', members.addVideoStory)
+app.post('/addNewVideoStory', members.addNewVideoStory)
 app.get('/returnTokenData', members.returnTokenData)
-app.get('/getVideoStories', members.findSomeStories)
+app.get('/getVideoStories/:listOfStoryIds', members.getVideoStories)
 
 app.use('/', indexRouter);
 app.use('/members', memberRouter);
