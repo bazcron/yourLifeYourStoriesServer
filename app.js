@@ -10,6 +10,7 @@ let memberRouter = require('./routes/members');
 let app = express();
 
 const members = require("./routes/members");
+
 const cors = require("cors");
 
 // view engine setup
@@ -27,14 +28,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/members', members.findAll);
 app.get('/members/:MemberName', members.findOne);
 app.post('/members',members.addMember);
-app.delete('/members/:id', members.deleteMember);
+app.delete('/members/:memberId', members.deleteMember);
 app.post('/members/:memberName', members.signIn);
 app.post('/addNewVideoStory', members.addNewVideoStory)
 app.get('/returnTokenData', members.returnTokenData)
 app.get('/getVideoStories/:listOfStoryIds', members.getVideoStories)
+app.get('/getVideosBasedOnSearch/:searchOptions', members.getVideosBasedOnSearch)
+app.get('/getVideosBasedOnDecade/:decade', members.getVideosBasedOnDecade)
 
 app.use('/', indexRouter);
 app.use('/members', memberRouter);
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -39,25 +39,15 @@ router.getVideoStories = (req, res) => {
 
     res.setHeader('Content-Type', 'application/json');
 
-    let arrayIThink = req.path.valueOf().split(',')
-    // let arrayIThink = req.path
+    let arrayOfValues = req.path.valueOf().split(',')
 
-    /*let stringJoin = arrayIThink.join(',')
-    let arrayAgain = stringJoin.split(',')
-    console.log('arrayIThink' )
-    console.log(arrayIThink)
-    console.log('stringJoin ')
-    console.log(stringJoin)
-    console.log('arrayAgain')
-    console.log( arrayAgain)*/
-
-    videoStories.find({'storyId': {$in: arrayIThink}}, function(err, videos){
+    videoStories.find({'storyId': {$in: arrayOfValues}}, function(err, videos){
         if (err) {
             console.log('err' + err);
             return res.json({message: 'Story NOT Found!'});
         }
         else {
-            console.log('arrayIThink' + arrayIThink);
+            console.log('arrayIThink' + arrayOfValues);
             // console.log('req ' + req)
             return res.send(JSON.stringify(videos, null, 5));
         }
@@ -67,6 +57,57 @@ router.getVideoStories = (req, res) => {
 function getByValue(array, id) {
   let result  = array.filter(function(obj){return obj.id == id;} );
   return result ? result[0] : null; // or undefined
+}
+
+router.getVideosBasedOnSearch = (req, res) =>{
+    res.setHeader('Content-Type', 'application/json');
+    console.log('inside router.getVideosBasedOnSearch');
+    let arrayOf = req.path.valueOf().split(',');
+
+    let country = arrayOf[0];
+    let language = arrayOf[1];
+    let decade = arrayOf[2];
+    country = country.split("/").pop();
+    decade = decade.replace('%20',' ');
+//
+    // REF: https://docs.mongodb.com/manual/reference/operator/query/and/   $and command
+    videoStories.find( {$and: [{'storyCountry': country} ,  {'storyLanguage': language} , {'storyDecade': decade}]} , function(err, videos){
+        console.log('returned videos ' + videos)
+         if (err) {
+            console.log('err' + err);
+            return res.status(400).json({
+                error: 'Unable to Save Video Story'
+            })
+        }
+        else { // send back all videos that match all 3 conditions
+            console.log(country + ".." + language + ".." + decade)
+            console.log('videos returned ' + videos);
+            return res.send(JSON.stringify(videos, null, 5));
+        }
+    })
+}
+// get videos by decade........................
+
+router.getVideosBasedOnDecade = (req, res) =>{
+    res.setHeader('Content-Type', 'application/json');
+
+    /*let decade = req.path.valueOf();
+    decade = decade.split("/").pop();
+    decade = decade.replace('%20',' ');*/
+//
+    videoStories.find({storyDecade: req.params.decade}), function(err, videos){
+        if (err) {
+            console.log('err' + err);
+            return res.status(400).json({
+                error: 'Unable to Return Video Story'
+            })
+        }
+        else { // send back all videos that match decade value
+            console.log(".." + decade)
+            console.log('videos returned ' + videos);
+            return res.send(JSON.stringify(videos, null, 5));
+        }
+    }
 }
 
 router.addNewVideoStory = (req, res) => {
@@ -171,8 +212,23 @@ console.log('inside router.addMember')
 }
 router.deleteMember = (req, res) => {
   //Delete the selected member based on its id
-  let member = getByValue(members,req.params.MemberName);
-  let index = members.indexOf(member);
+    console.log('inside delete member' + req.params.memberId)
+    members.findByIdAndRemove(req.params.memberId, function(err) {
+        if (err)
+            res.json({ message: 'Sorry That ID was not valid: Member Deletion was not possible!', errmsg : err } );
+        else
+            res.json({ message: 'Member Deleted!'});
+    });
+    /*members.findByIdAndRemove(req.params.memberId, function(err) {
+        if (err)
+            res.json({ message: 'Sorry that Member ID is not on our system!', errmsg : err } );
+        else
+            res.json({ message: 'Member Deleted!'});
+    });*/
+  /*let member = getByValue('MemberName',req.params.memberName);
+    console.log(member)
+
+    let index = members.indexOf(member);
 
   let currentSize = members.length;
   members.splice(index, 1);
@@ -180,7 +236,7 @@ router.deleteMember = (req, res) => {
   if((currentSize - 1) == members.length)
     return res.json({ message: 'Member Deleted!'});
   else
-    return res.json({ message: 'Member NOT Deleted!'});
+    return res.json({ message: 'Member NOT Deleted!'});*/
 }
 
 router.signIn = (req, res) => {
@@ -270,3 +326,42 @@ router.findAll = (req, res) => {
 
 module.exports = router;
 */
+
+//....................... previous code ................................
+/*videoStories.find({'storyCountry': country} &&  {'storyLanguage': language} && {'storyDecade': decade} , function(err, videos){
+       if (err) {
+           console.log('err' + err);
+           return res.json({message: 'Story NOT Found!'});
+       }
+       else { // send back all videos that match all 3 conditions
+           console.log(country + ".." + language + ".." + decade)
+               console.log('videos returned ' + videos);
+               return res.send(JSON.stringify(videos, null, 5));
+           }
+   });*/
+/* videoStories.find({'storyDecade': decade} , function(err, videos){
+     if (err) {
+         console.log('err' + err);
+         return res.json({message: 'Story NOT Found!'});
+     }
+     else { videoStories.find({'storyLanguage': language} , function(err, videos2) {
+         if (err) {
+             console.log('err' + err);
+             return res.json({message: 'Story NOT Found!'});
+         } else {
+             videoStories.find({'storyCountry': country}, function (err, videos3) {
+                 if (err) {
+                     console.log('err' + err);
+                     return res.json({message: 'Story NOT Found!'});
+                 } else {// send back all videos that match all 3 conditions
+                     console.log(country + ".." + language + ".." + decade)
+                     console.log('videos returned ' + videos);
+                     return res.send(JSON.stringify(videos, null, 5));
+                 }
+         })
+
+     }
+  })
+}
+ });*/
+

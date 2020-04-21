@@ -1,10 +1,3 @@
-/*const members = [
-    {id:1, MemberName: 'barry', password: "pass"},
-    {id:2, MemberName: 'jim', password:"pass"}
-];
-*/
-//module.exports = members;
-
 let mongoose = require('mongoose')
 
 let membersSchema = new mongoose.Schema({
