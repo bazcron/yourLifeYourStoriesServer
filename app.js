@@ -36,6 +36,7 @@ app.get('/getVideoStories/:listOfStoryIds', members.getVideoStories)
 app.get('/getVideosBasedOnSearch/:searchOptions', members.getVideosBasedOnSearch)
 app.get('/getVideosBasedOnDecade/:decade', members.getVideosBasedOnDecade)
 
+
 app.use('/', indexRouter);
 app.use('/members', memberRouter);
 

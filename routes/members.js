@@ -13,16 +13,16 @@ let db = mongoose.connection
 let token = webToken
 let decodedMemberId = ''
 db.on('error', function (err) {
-  console.log('Unable to Connect to [ ' + db.name + ' ]', err)
+    console.log('Unable to Connect to [ ' + db.name + ' ]', err)
 })
 
 db.once('open', function () {
-  console.log('Successfully Connected to [ ' + db.name + ' ]')
+    console.log('Successfully Connected to [ ' + db.name + ' ]')
 })
 
 router.findAll = (req, res) => {
-  // Return a JSON representation of our list
-  res.json(members);
+    // Return a JSON representation of our list
+    res.json(members);
 }
 router.findOne = (req, res) => {
 
@@ -55,8 +55,8 @@ router.getVideoStories = (req, res) => {
 }
 
 function getByValue(array, id) {
-  let result  = array.filter(function(obj){return obj.id == id;} );
-  return result ? result[0] : null; // or undefined
+    let result  = array.filter(function(obj){return obj.id == id;} );
+    return result ? result[0] : null; // or undefined
 }
 
 router.getVideosBasedOnSearch = (req, res) =>{
@@ -71,12 +71,13 @@ router.getVideosBasedOnSearch = (req, res) =>{
     decade = decade.replace('%20',' ');
 //
     // REF: https://docs.mongodb.com/manual/reference/operator/query/and/   $and command
-    videoStories.find( {$and: [{'storyCountry': country} ,  {'storyLanguage': language} , {'storyDecade': decade}]} , function(err, videos){
+    videoStories.find( {$or: [{'storyCountry': country, 'storyLanguage': language, 'storyDecade': decade},
+            {'storyCountry': country, 'storyLanguage': language}]} , function(err, videos){
         console.log('returned videos ' + videos)
-         if (err) {
+        if (err) {
             console.log('err' + err);
             return res.status(400).json({
-                error: 'Unable to Save Video Story'
+                error: '<b>Sorry.</b> We Could Not Find Videos By Your Search. Please Try A New Search'
             })
         }
         else { // send back all videos that match all 3 conditions
@@ -156,10 +157,10 @@ router.addNewVideoStory = (req, res) => {
                             return res.status(400).json({
                                 error: 'Could not add video Id to member!'
                             })
-                                // return res.json({ message: 'Could not add video Id to member!', errmsg : member } );
-                       //  else
-                            // return res.json({ message: 'Video Id added to member!', data: member });
-                       //  return res.json({ error: 'Video Id added to member!' });
+                        // return res.json({ message: 'Could not add video Id to member!', errmsg : member } );
+                        //  else
+                        // return res.json({ message: 'Video Id added to member!', data: member });
+                        //  return res.json({ error: 'Video Id added to member!' });
                     });
                 }
             });
@@ -168,25 +169,25 @@ router.addNewVideoStory = (req, res) => {
             })
         }
 
-        });
+    });
 }
 
 router.addMember = (req, res) => {
 
-  res.setHeader('Content-Type', 'application/json');
-console.log('inside router.addMember')
+    res.setHeader('Content-Type', 'application/json');
+    console.log('inside router.addMember')
 
-  let member = new members();
+    let member = new members();
 
-  member.MemberName = req.body.memberName;
-  member.Email =req.body.email;
-  member.Password = req.body.password;
-  member.Bio = '';
-  member.VideoStorageTime = 2000000;
-  member.videos = [];
-  console.log(member);
+    member.MemberName = req.body.memberName;
+    member.Email =req.body.email;
+    member.Password = req.body.password;
+    member.Bio = '';
+    member.VideoStorageTime = 1200000;
+    member.videos = [];
+    console.log(member);
 
-  //...................... Encrypt the password -- then Add the new Member...................................
+    //...................... Encrypt the password -- then Add the new Member...................................
     bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(member.Password, salt, (err, hash) =>{
             if (err) throw err;
@@ -211,7 +212,7 @@ console.log('inside router.addMember')
 
 }
 router.deleteMember = (req, res) => {
-  //Delete the selected member based on its id
+    //Delete the selected member based on its id
     console.log('inside delete member' + req.params.memberId)
     members.findByIdAndRemove(req.params.memberId, function(err) {
         if (err)
@@ -225,22 +226,19 @@ router.deleteMember = (req, res) => {
         else
             res.json({ message: 'Member Deleted!'});
     });*/
-  /*let member = getByValue('MemberName',req.params.memberName);
-    console.log(member)
-
-    let index = members.indexOf(member);
-
-  let currentSize = members.length;
-  members.splice(index, 1);
-
-  if((currentSize - 1) == members.length)
-    return res.json({ message: 'Member Deleted!'});
-  else
-    return res.json({ message: 'Member NOT Deleted!'});*/
+    /*let member = getByValue('MemberName',req.params.memberName);
+      console.log(member)
+      let index = members.indexOf(member);
+    let currentSize = members.length;
+    members.splice(index, 1);
+    if((currentSize - 1) == members.length)
+      return res.json({ message: 'Member Deleted!'});
+    else
+      return res.json({ message: 'Member NOT Deleted!'});*/
 }
 
 router.signIn = (req, res) => {
-console.log('inside login in server' )
+    console.log('inside login in server' )
     console.log("member name"+req.body.memberName)
     console.log("password name"+req.body.password)
 
@@ -249,7 +247,7 @@ console.log('inside login in server' )
     members.findOne({ MemberName : req.body.memberName},function(err, members) {
         if (err) return res.status(500).json({
             error: err
-    })
+        })
         if(!members){
             return res.status(401).json({
                 error: 'That Member or Password is Wrong'
@@ -284,7 +282,7 @@ router.returnTokenData = (req, res, next) => {
         // if token is valid...........................
         members.findOne({_id: decoded.memberId}, (err, members) => {
             if (err) return console.log(err)
-            console.log(members);
+            console.log('inside return token data : ' + members);
             // no error..return token data
             return res.status(200).json({
                 members: {
@@ -299,14 +297,14 @@ router.returnTokenData = (req, res, next) => {
 
 router.findOne = (req, res) => {
 
-  res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Type', 'application/json');
 
-  members.find({ "_id" : req.params.id },function(err, member) {
-    if (err)
-      return res.json({ message: 'member NOT Found!', errmsg : err } );
-    else
-      return res.send(JSON.stringify(member,null,5));
-  });
+    members.find({ "_id" : req.params.id },function(err, member) {
+        if (err)
+            return res.json({ message: 'member NOT Found!', errmsg : err } );
+        else
+            return res.send(JSON.stringify(member,null,5));
+    });
 }
 
 
@@ -316,14 +314,11 @@ module.exports = router;
 router.findAll = (req, res) => {
   // Return a JSON representation of our list
   res.setHeader('Content-Type', 'application/json')
-
   Members.findAll(function (err, members) {
     if (err) { res.send(err) }
-
     res.send(JSON.stringify(members, null, 5))
   })
 }
-
 module.exports = router;
 */
 
@@ -359,9 +354,7 @@ module.exports = router;
                      return res.send(JSON.stringify(videos, null, 5));
                  }
          })
-
      }
   })
 }
  });*/
-
