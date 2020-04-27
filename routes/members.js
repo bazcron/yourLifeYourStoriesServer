@@ -218,6 +218,16 @@ router.addMember = (req, res) => {
     })
 
 }
+
+router.deleteVideoStory = (req, res) =>{
+    console.log('Inside Delete Video Story by id' + req.params.videoId)
+    videoStories.findByIdAndDelete(req.params.videoId, function(err) {
+        if (err)
+            res.json({ message: 'Sorry That ID was not valid: Video Deletion was not possible!', errmsg : err } );
+        else
+            res.json({ message: 'Video Deleted!'});
+    });
+}
 router.deleteMember = (req, res) => {
     //Delete the selected member based on its id
     console.log('inside delete member' + req.params.memberId)

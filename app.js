@@ -29,6 +29,7 @@ app.get('/members', members.findAll);
 app.get('/members/:MemberName', members.findOne);
 app.post('/members',members.addMember);
 app.delete('/members/:memberId', members.deleteMember);
+app.delete('/deleteVideoStory/:videoId', members.deleteVideoStory);
 app.post('/members/:memberName', members.signIn);
 app.post('/addNewVideoStory', members.addNewVideoStory)
 app.get('/returnTokenData', members.returnTokenData)
