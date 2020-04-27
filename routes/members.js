@@ -286,6 +286,7 @@ router.returnTokenData = (req, res, next) => {
             // no error..return token data
             return res.status(200).json({
                 members: {
+                    VideoStorageTime: members.VideoStorageTime,
                     MemberId: members._id,
                     MemberName: members.MemberName,
                     storyId: members.storyId
