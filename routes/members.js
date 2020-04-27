@@ -39,7 +39,13 @@ router.getVideoStories = (req, res) => {
 
     res.setHeader('Content-Type', 'application/json');
 
-    let arrayOfValues = req.path.valueOf().split(',')
+    let arrayOfValues = req.path.valueOf().split(',')  // splits the string into an array
+    // takes first element and removed unneeded text
+    let fixFirstArrayElement = arrayOfValues[0];
+    fixFirstArrayElement = fixFirstArrayElement.split("/").pop();
+    // overwrites first element with correct storyId
+    arrayOfValues[0] = fixFirstArrayElement
+    console.log('inside server: get Video Stories ' + arrayOfValues)
 
     videoStories.find({'storyId': {$in: arrayOfValues}}, function(err, videos){
         if (err) {
@@ -72,7 +78,8 @@ router.getVideosBasedOnSearch = (req, res) =>{
 //
     // REF: https://docs.mongodb.com/manual/reference/operator/query/and/   $and command
     videoStories.find( {$or: [{'storyCountry': country, 'storyLanguage': language, 'storyDecade': decade},
-            {'storyCountry': country, 'storyLanguage': language}]} , function(err, videos){
+            {'storyCountry': country, 'storyLanguage': language}, {'storyCountry': country, 'storyDecade': decade},
+            {'storyLanguage': language, 'storyDecade': decade}, {'storyDecade': decade}, {'storyLanguage': language}, {'storyCountry': country}]} , function(err, videos){
         console.log('returned videos ' + videos)
         if (err) {
             console.log('err' + err);
@@ -182,7 +189,7 @@ router.addMember = (req, res) => {
     member.MemberName = req.body.memberName;
     member.Email =req.body.email;
     member.Password = req.body.password;
-    member.Bio = '';
+    member.Bio = req.body.bio;
     member.VideoStorageTime = 1200000;
     member.videos = [];
     console.log(member);
