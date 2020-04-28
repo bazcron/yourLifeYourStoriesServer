@@ -75,11 +75,18 @@ router.getVideosBasedOnSearch = (req, res) =>{
     let decade = arrayOf[2];
     country = country.split("/").pop();
     decade = decade.replace('%20',' ');
+    console.log('decade ' + decade)
 //
     // REF: https://docs.mongodb.com/manual/reference/operator/query/and/   $and command
-    videoStories.find( {$or: [{'storyCountry': country, 'storyLanguage': language, 'storyDecade': decade},
-            {'storyCountry': country, 'storyLanguage': language}, {'storyCountry': country, 'storyDecade': decade},
-            {'storyLanguage': language, 'storyDecade': decade}, {'storyDecade': decade}, {'storyLanguage': language}, {'storyCountry': country}]} , function(err, videos){
+    videoStories.find( {$and: [{'storyDecade': decade},
+            {'storyLanguage': language},
+            {'storyCountry': country}/*{'storyCountry': country, 'storyLanguage': language, 'storyDecade': decade},
+            {'storyCountry': country, 'storyLanguage': language},
+            {'storyCountry': country, 'storyDecade': decade},
+            {'storyLanguage': language, 'storyDecade': decade},
+            {'storyDecade': decade},
+            {'storyLanguage': language},
+            {'storyCountry': country}*/]} , function(err, videos){
         console.log('returned videos ' + videos)
         if (err) {
             console.log('err' + err);
@@ -89,11 +96,62 @@ router.getVideosBasedOnSearch = (req, res) =>{
         }
         else { // send back all videos that match all 3 conditions
             console.log(country + ".." + language + ".." + decade)
-            console.log('videos returned ' + videos);
             return res.send(JSON.stringify(videos, null, 5));
         }
     })
 }
+// gev videos based on ......................
+
+router.getVideosBasedOnCountryLanguage = (req, res) =>{
+    res.setHeader('Content-Type', 'application/json');
+    console.log('inside router.getVideosBasedOnSearch');
+    let arrayOf = req.path.valueOf().split(',');
+
+    let country = arrayOf[0];
+    let language = arrayOf[1];
+    country = country.split("/").pop();
+//
+    // REF: https://docs.mongodb.com/manual/reference/operator/query/and/   $and command
+    videoStories.find( {$and: [{'storyLanguage': language}, {'storyCountry': country}] }, function(err, videos){
+        console.log('returned videos ' + videos)
+        if (err) {
+            console.log('err' + err);
+            return res.status(400).json({
+                error: '<b>Sorry.</b> We Could Not Find Videos By Your Search. Please Try A New Search'
+            })
+        }
+        else { // send back all videos that match all 3 conditions
+            console.log(country + ".." + language)
+            return res.send(JSON.stringify(videos, null, 5));
+        }
+    })
+}
+
+    // gev videos based on ......................
+
+    router.getVideosBasedOnCountryLanguage = (req, res) =>{
+        res.setHeader('Content-Type', 'application/json');
+        console.log('inside router.getVideosBasedOnSearch');
+        let arrayOf = req.path.valueOf().split(',');
+
+        let country = arrayOf[0];
+        let language = arrayOf[1];
+        country = country.split("/").pop();
+//
+        // REF: https://docs.mongodb.com/manual/reference/operator/query/and/   $and command
+        videoStories.find( {$and: [{'storyLanguage': language}, {'storyCountry': country}] }, function(err, videos) {
+            console.log('returned videos ' + videos)
+            if (err) {
+                console.log('err' + err);
+                return res.status(400).json({
+                    error: '<b>Sorry.</b> We Could Not Find Videos By Your Search. Please Try A New Search'
+                })
+            } else { // send back all videos that match all 3 conditions
+                console.log(country + ".." + language)
+                return res.send(JSON.stringify(videos, null, 5));
+            }
+        })
+    }
 // get videos by decade........................
 
 router.getVideosBasedOnDecade = (req, res) =>{
@@ -103,17 +161,16 @@ router.getVideosBasedOnDecade = (req, res) =>{
     decade = decade.split("/").pop();
     decade = decade.replace('%20',' ');*/
 //
-    videoStories.find({storyDecade: req.params.decade}), function(err, videos){
+    videoStories.find({storyDecade: req.params.decade}), function(err, videos) {
         if (err) {
             console.log('err' + err);
             return res.status(400).json({
                 error: 'Unable to Return Video Story'
             })
-        }
-        else { // send back all videos that match decade value
+        } else { // send back all videos that match decade value
             console.log(".." + decade)
             console.log('videos returned ' + videos);
-            return res.send(JSON.stringify(videos, null, 5));
+            return res.send(JSON.stringify(videos, null, 5))
         }
     }
 }

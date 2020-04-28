@@ -36,6 +36,9 @@ app.get('/returnTokenData', members.returnTokenData)
 app.get('/getVideoStories/:listOfStoryIds', members.getVideoStories)
 app.get('/getVideosBasedOnSearch/:searchOptions', members.getVideosBasedOnSearch)
 app.get('/getVideosBasedOnDecade/:decade', members.getVideosBasedOnDecade)
+app.get('/getVideosBasedOnCountryLanguage/:searchOptions', members.getVideosBasedOnCountryLanguage)
+
+
 
 
 app.use('/', indexRouter);
