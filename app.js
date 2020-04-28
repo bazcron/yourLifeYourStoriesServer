@@ -33,10 +33,18 @@ app.delete('/deleteVideoStory/:videoId', members.deleteVideoStory);
 app.post('/members/:memberName', members.signIn);
 app.post('/addNewVideoStory', members.addNewVideoStory)
 app.get('/returnTokenData', members.returnTokenData)
+
 app.get('/getVideoStories/:listOfStoryIds', members.getVideoStories)
 app.get('/getVideosBasedOnSearch/:searchOptions', members.getVideosBasedOnSearch)
-app.get('/getVideosBasedOnDecade/:decade', members.getVideosBasedOnDecade)
 app.get('/getVideosBasedOnCountryLanguage/:searchOptions', members.getVideosBasedOnCountryLanguage)
+app.get('/getVideosBasedOnCountryDecade/:searchOptions', members.getVideosBasedOnCountryDecade)
+app.get('/getVideosBasedOnLanguageDecade/:searchOptions', members.getVideosBasedOnLanguageDecade)
+app.get('/getVideosBasedOnCountry/:searchOptions', members.getVideosBasedOnCountry)
+app.get('/getVideosBasedOnLanguage/:searchOptions', members.getVideosBasedOnLanguage)
+app.get('/getVideosBasedOnDecade/:searchOptions', members.getVideosBasedOnDecade)
+
+
+
 
 
 

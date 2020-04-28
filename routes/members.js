@@ -80,7 +80,10 @@ router.getVideosBasedOnSearch = (req, res) =>{
     // REF: https://docs.mongodb.com/manual/reference/operator/query/and/   $and command
     videoStories.find( {$and: [{'storyDecade': decade},
             {'storyLanguage': language},
-            {'storyCountry': country}/*{'storyCountry': country, 'storyLanguage': language, 'storyDecade': decade},
+            {'storyCountry': country}
+            // could not get video Search for all variations to work in one find, using $and or $or
+            // had to split each combination of search options into their own get
+            /*{'storyCountry': country, 'storyLanguage': language, 'storyDecade': decade},
             {'storyCountry': country, 'storyLanguage': language},
             {'storyCountry': country, 'storyDecade': decade},
             {'storyLanguage': language, 'storyDecade': decade},
@@ -100,35 +103,8 @@ router.getVideosBasedOnSearch = (req, res) =>{
         }
     })
 }
-// gev videos based on ......................
 
-router.getVideosBasedOnCountryLanguage = (req, res) =>{
-    res.setHeader('Content-Type', 'application/json');
-    console.log('inside router.getVideosBasedOnSearch');
-    let arrayOf = req.path.valueOf().split(',');
-
-    let country = arrayOf[0];
-    let language = arrayOf[1];
-    country = country.split("/").pop();
-//
-    // REF: https://docs.mongodb.com/manual/reference/operator/query/and/   $and command
-    videoStories.find( {$and: [{'storyLanguage': language}, {'storyCountry': country}] }, function(err, videos){
-        console.log('returned videos ' + videos)
-        if (err) {
-            console.log('err' + err);
-            return res.status(400).json({
-                error: '<b>Sorry.</b> We Could Not Find Videos By Your Search. Please Try A New Search'
-            })
-        }
-        else { // send back all videos that match all 3 conditions
-            console.log(country + ".." + language)
-            return res.send(JSON.stringify(videos, null, 5));
-        }
-    })
-}
-
-    // gev videos based on ......................
-
+    // get videos based on Country & Language......................
     router.getVideosBasedOnCountryLanguage = (req, res) =>{
         res.setHeader('Content-Type', 'application/json');
         console.log('inside router.getVideosBasedOnSearch');
@@ -146,22 +122,121 @@ router.getVideosBasedOnCountryLanguage = (req, res) =>{
                 return res.status(400).json({
                     error: '<b>Sorry.</b> We Could Not Find Videos By Your Search. Please Try A New Search'
                 })
-            } else { // send back all videos that match all 3 conditions
+            } else { // send back all videos that match 2 conditions
                 console.log(country + ".." + language)
                 return res.send(JSON.stringify(videos, null, 5));
             }
         })
     }
-// get videos by decade........................
 
+// get videos based on Country & Language......................
+router.getVideosBasedOnCountryDecade = (req, res) =>{
+    res.setHeader('Content-Type', 'application/json');
+    console.log('inside router.getVideosBasedOnSearch');
+    let arrayOf = req.path.valueOf().split(',');
+
+    let country = arrayOf[0];
+    let decade = arrayOf[1];
+    decade = decade.replace('%20',' ');
+    country = country.split("/").pop();
+//
+    // REF: https://docs.mongodb.com/manual/reference/operator/query/and/   $and command
+    videoStories.find( {$and: [{'storyCountry': country}, {'storyDecade': decade}] }, function(err, videos) {
+        console.log('returned videos ' + videos)
+        if (err) {
+            console.log('err' + err);
+            return res.status(400).json({
+                error: '<b>Sorry.</b> We Could Not Find Videos By Your Search. Please Try A New Search'
+            })
+        } else { // send back all videos that match by 2 conditions
+            return res.send(JSON.stringify(videos, null, 5));
+        }
+    })
+}
+
+// get videos based on Country & Language......................
+router.getVideosBasedOnLanguageDecade = (req, res) =>{
+    res.setHeader('Content-Type', 'application/json');
+    console.log('inside router.getVideosBasedOnSearch');
+    let arrayOf = req.path.valueOf().split(',');
+
+    let language = arrayOf[0];
+    let decade = arrayOf[1];
+    decade = decade.replace('%20',' ');
+    language = language.split("/").pop();
+//
+    // REF: https://docs.mongodb.com/manual/reference/operator/query/and/   $and command
+    videoStories.find( {$and: [{'storyLanguage': language}, {'storyDecade': decade}] }, function(err, videos) {
+        console.log('returned videos ' + videos)
+        if (err) {
+            console.log('err' + err);
+            return res.status(400).json({
+                error: '<b>Sorry.</b> We Could Not Find Videos By Your Search. Please Try A New Search'
+            })
+        } else { // send back all videos that match by 2 conditions
+            return res.send(JSON.stringify(videos, null, 5));
+        }
+    })
+}
+// get videos based on Country & Language......................
+router.getVideosBasedOnCountry = (req, res) =>{
+    res.setHeader('Content-Type', 'application/json');
+    console.log('inside router.getVideosBasedOnSearch');
+
+  /*  let country = req.path.valueOf();
+    country = country.split("/").pop();
+    country = country.replace('%20',' ');*/
+//
+    // REF: https://docs.mongodb.com/manual/reference/operator/query/and/   $and command
+    videoStories.find({storyCountry: req.params.searchOptions}), function(err, videos) {
+        console.log('returned videos ' + videos)
+        if (err) {
+            console.log('err' + err);
+            return res.status(400).json({
+                error: '<b>Sorry.</b> We Could Not Find Videos By Your Search. Please Try A New Search'
+            })
+        } else { // send back all videos that match a condition
+            return res.send(JSON.stringify(videos, null, 5));
+        }
+    }
+}
+// get videos based on Country & Language......................
+router.getVideosBasedOnLanguage = (req, res) =>{
+    res.setHeader('Content-Type', 'application/json');
+    console.log('inside router.getVideosBasedOnSearch');
+    let arrayOf = req.path.valueOf().split(',');
+
+   /* let country = arrayOf[0];
+    let decade = arrayOf[1];
+    country = country.split("/").pop();*/
+//
+    // REF: https://docs.mongodb.com/manual/reference/operator/query/and/   $and command
+    videoStories.find({storyDecade: req.params.searchOptions}), function(err, videos) {
+        console.log('returned videos ' + videos)
+        if (err) {
+            console.log('err' + err);
+            return res.status(400).json({
+                error: '<b>Sorry.</b> We Could Not Find Videos By Your Search. Please Try A New Search'
+            })
+        } else { // send back all videos that match a condition
+            return res.send(JSON.stringify(videos, null, 5));
+        }
+    }
+}
+
+// get videos by decade........................
 router.getVideosBasedOnDecade = (req, res) =>{
     res.setHeader('Content-Type', 'application/json');
 
-    /*let decade = req.path.valueOf();
+    let decade = req.path.valueOf();
+    console.log('full decade value before editing ' + decade)
     decade = decade.split("/").pop();
-    decade = decade.replace('%20',' ');*/
+    console.log('decade value after splitting ' + decade)
+    decade = decade.replace('%20',' ');
+    console.log('decade value after editing ' + decade + '...')
+console.log(req.params.searchOptions + '..')
 //
-    videoStories.find({storyDecade: req.params.decade}), function(err, videos) {
+    videoStories.find({'storyDecade': req.params.searchOptions}), function(err, videos) {
         if (err) {
             console.log('err' + err);
             return res.status(400).json({
